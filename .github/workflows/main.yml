@@ -9,9 +9,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.PERSONAL_KEY }}
+        aws-secret-access-key: ${{ secrets.PERSONAL_SECRET }}
+        aws-region: eu-central-1
+
+    - name: Install stuff
       run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+        echo Installing Gatsby and Gatsby-CLI...
+        npm install -g gatsby
+        npm install -g gatsby-cli
+        npm install
+        npm run build
+    - name: Upload stuff
+      run: |
+        aws s3 sync Build/* s3://awesome-cheetah-2.s3-website.eu-central-1.amazonaws.com/
